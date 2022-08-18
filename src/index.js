@@ -21,8 +21,10 @@ export class HTMLText extends Sprite
      * @param {PIXI.TextStyle} [style] - Style settings, not all TextStyle options are supported.
      * @param {HTMLCanvasElement} [canvas] - Optional canvas to use for rendering.
      *.       if undefined, will generate it's own canvas using createElement.
+     * @param {object<string, string>} [cssStyle] - CSS Style settings for HTML elements in text
+     *        Where key is selector, value is styles
      */
-    constructor(text = '', style = {}, canvas)
+    constructor(text = '', style = {}, canvas, cssStyle = {})
     {
         canvas = canvas || document.createElement('canvas');
 
@@ -40,6 +42,7 @@ export class HTMLText extends Sprite
         const svgRoot = document.createElementNS(ns, 'svg');
         const foreignObject = document.createElementNS(ns, 'foreignObject');
         const domElement = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+        domElement.classList.add('pixi-html_text');
 
         foreignObject.setAttribute('height', '100%');
         foreignObject.setAttribute('width', '100%');
@@ -56,9 +59,11 @@ export class HTMLText extends Sprite
         this._autoResolution = true;
         this._text = null;
         this._style = null;
+        this._cssStyle = null;
         this._loading = false;
         this.text = text;
         this.style = style;
+        this.cssStyle = cssStyle;
         this.localStyleID = -1;
     }
 
@@ -163,6 +168,11 @@ export class HTMLText extends Sprite
 
         // Assemble the svg output
         this._foreignObject.appendChild(dom);
+
+        const cssStyleEl = document.createElement('style');
+        cssStyleEl.innerHTML = this.stringCssStyle;
+        this._foreignObject.insertAdjacentElement('afterbegin', cssStyleEl);
+
         this._svgRoot.setAttribute('width', width);
         this._svgRoot.setAttribute('height', height);
 
@@ -191,6 +201,18 @@ export class HTMLText extends Sprite
                 this.updateTexture();
             };
         }
+    }
+
+    get stringCssStyle()
+    {
+        let css = '';
+
+        for (const k in this._cssStyle)
+        {
+            css += `.pixi-html_text ${k} {${this._cssStyle[k]}}`;
+        }
+
+        return css;
     }
 
     /**
@@ -314,6 +336,7 @@ export class HTMLText extends Sprite
         this.canvas.width = this.canvas.height = 0; // Safari hack
         this.canvas = null;
         this._style = null;
+        this._cssStyle = null;
         this._svgRoot = null;
         this._domElement = null;
         this._foreignObject = null;
@@ -387,6 +410,21 @@ export class HTMLText extends Sprite
         }
 
         this.localStyleID = -1;
+        this.dirty = true;
+    }
+
+    /**
+     * The CSS style to render with text.
+     * @member {string}
+     */
+    get cssStyle()
+    {
+        return this._cssStyle;
+    }
+
+    set cssStyle(style) // eslint-disable-line require-jsdoc
+    {
+        this._cssStyle = style || {};
         this.dirty = true;
     }
 
