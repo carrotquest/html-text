@@ -23,8 +23,9 @@ export class HTMLText extends Sprite
      *.       if undefined, will generate it's own canvas using createElement.
      * @param {object<string, string>} [cssStyle] - CSS Style settings for HTML elements in text
      *        Where key is selector, value is styles
+     * @param resolution - For some reason our resolution is different on first render. This const is to make it fixed
      */
-    constructor(text = '', style = {}, canvas, cssStyle = {})
+    constructor(text = '', style = {}, canvas, cssStyle = {}, resolution)
     {
         canvas = canvas || document.createElement('canvas');
 
@@ -55,7 +56,7 @@ export class HTMLText extends Sprite
 
         this.canvas = canvas;
         this.context = this.canvas.getContext('2d');
-        this._resolution = settings.RESOLUTION;
+        this._resolution = resolution ? resolution : settings.RESOLUTION;
         this._autoResolution = true;
         this._text = null;
         this._style = null;
