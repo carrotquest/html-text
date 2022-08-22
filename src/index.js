@@ -161,6 +161,11 @@ export class HTMLText extends Sprite
             style: css,
         });
 
+        const cssStyleEl = document.createElement('style');
+
+        cssStyleEl.innerHTML = this.stringCssStyle;
+        dom.insertAdjacentElement('afterbegin', cssStyleEl);
+
         // Measure the contents
         document.body.appendChild(dom);
         const { width, height } = dom.getBoundingClientRect();
@@ -169,10 +174,6 @@ export class HTMLText extends Sprite
 
         // Assemble the svg output
         this._foreignObject.appendChild(dom);
-
-        const cssStyleEl = document.createElement('style');
-        cssStyleEl.innerHTML = this.stringCssStyle;
-        this._foreignObject.insertAdjacentElement('afterbegin', cssStyleEl);
 
         this._svgRoot.setAttribute('width', width);
         this._svgRoot.setAttribute('height', height);
